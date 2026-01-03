@@ -1,4 +1,4 @@
-#include "kv_store.h"
+﻿#include "kv_store.h"
 
 #include <unordered_map>
 #include <string>
@@ -107,6 +107,7 @@ KVStore::~KVStore() {
 bool KVStore::set(const std::string& key,
 	const std::string& value,
 	int ttl_seconds) {
+
 	std::lock_guard<std::mutex> lock(impl_->mutex);
 
 	Entry entry;
@@ -117,17 +118,21 @@ bool KVStore::set(const std::string& key,
 
 	bool exists = impl_->store.count(key);
 
-	impl_->store[key] = std::move(entry);
-
-	if (impl_->policy == EvictionPolicyType::LRU) {
-		impl_->touchLRU(key);
+	if (exists) {
+		if (impl_->policy == EvictionPolicyType::LRU) {
+			impl_->touchLRU(key);
+		}
 	}
 	else {
-		impl_->freq[key]++;   // LFU increment
-	}
-
-	if (!exists) {
-		impl_->evictIfNeeded();
+		impl_->store[key] = std::move(entry);
+		if (impl_->policy == EvictionPolicyType::LRU) {
+			impl_->touchLRU(key);
+			impl_->evictIfNeeded();
+		}
+		else if (impl_->policy == EvictionPolicyType::LFU) {
+			impl_->evictIfNeeded();
+			impl_->freq[key] = 1;   // ← initialize ONLY
+		}
 	}
 
 	return true;
@@ -135,6 +140,7 @@ bool KVStore::set(const std::string& key,
 
 
 bool KVStore::get(const std::string& key, std::string& out_value) {
+
 	std::lock_guard<std::mutex> lock(impl_->mutex);
 
 	auto it = impl_->store.find(key);
@@ -149,7 +155,7 @@ bool KVStore::get(const std::string& key, std::string& out_value) {
 	if (impl_->policy == EvictionPolicyType::LRU) {
 		impl_->touchLRU(key);
 	}
-	else {
+	else if (impl_->policy == EvictionPolicyType::LFU) {
 		impl_->freq[key]++;   // LFU increment
 	}
 
@@ -159,6 +165,7 @@ bool KVStore::get(const std::string& key, std::string& out_value) {
 
 
 bool KVStore::del(const std::string& key) {
+
 	std::lock_guard<std::mutex> lock(impl_->mutex);
 
 	if (impl_->store.count(key) == 0)
@@ -170,6 +177,7 @@ bool KVStore::del(const std::string& key) {
 
 
 std::size_t KVStore::size() const {
+
 	std::lock_guard<std::mutex> lock(impl_->mutex);
 
 	std::size_t count = 0;

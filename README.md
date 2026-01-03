@@ -48,6 +48,7 @@ Basic unit tests validate:
 - LRU eviction
 - LFU eviction
 - Thread safety under concurrent access
+- Verified memory safety with Valgrind, ensuring zero memory leaks and no use-after-free errors
 
 ## Future Improvements
 

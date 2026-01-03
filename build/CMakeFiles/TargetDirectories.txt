@@ -1,3 +1,0 @@
-/mnt/d/Prajjwal/Code/Redis-Lite/build/CMakeFiles/redis_lite.dir
-/mnt/d/Prajjwal/Code/Redis-Lite/build/CMakeFiles/edit_cache.dir
-/mnt/d/Prajjwal/Code/Redis-Lite/build/CMakeFiles/rebuild_cache.dir

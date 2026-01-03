@@ -1,2 +1,0 @@
-/usr/bin/ar qc libredis_lite.a CMakeFiles/redis_lite.dir/src/kv_store.cpp.o CMakeFiles/redis_lite.dir/src/lru_policy.cpp.o CMakeFiles/redis_lite.dir/src/lfu_policy.cpp.o
-/usr/bin/ranlib libredis_lite.a

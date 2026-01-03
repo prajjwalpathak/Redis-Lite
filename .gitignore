@@ -361,3 +361,50 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# CMake generated build files and directories
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+CMakeUserPresets.json
+
+# Common build directories (choose one or more as per your convention)
+build/
+out/
+bin/
+bld/
+[Dd]ebug/
+[Rr]elease/
+
+# Clion (JetBrains IDE) specific
+.idea/
+cmake-build-*/
+
+# Visual Studio specific
+.vs/
+[Dd]ebugPublic/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+
+# Other common files
+*.swp   # vim temporary files
+*~      # emacs temporary files

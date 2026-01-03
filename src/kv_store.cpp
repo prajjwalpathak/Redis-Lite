@@ -26,9 +26,12 @@ struct KVStore::Impl {
 
 	std::unordered_map<std::string, Entry> store;
 
-	// LRU structures
+	// LRU
 	std::list<std::string> lru_list;
 	std::unordered_map<std::string, std::list<std::string>::iterator> lru_map;
+
+	// LFU
+	std::unordered_map<std::string, std::size_t> freq;
 
 	mutable std::mutex mutex;
 
@@ -47,23 +50,44 @@ struct KVStore::Impl {
 		lru_map[key] = lru_list.begin();
 	}
 
+	void removeKey(const std::string& key) {
+		store.erase(key);
+
+		// LRU cleanup
+		auto lit = lru_map.find(key);
+		if (lit != lru_map.end()) {
+			lru_list.erase(lit->second);
+			lru_map.erase(lit);
+		}
+
+		// LFU cleanup
+		freq.erase(key);
+	}
+
 	void evictIfNeeded() {
 		if (store.size() <= capacity)
 			return;
 
-		const std::string& victim = lru_list.back();
-		store.erase(victim);
-		lru_map.erase(victim);
-		lru_list.pop_back();
-	}
-
-	void removeKey(const std::string& key) {
-		store.erase(key);
-		auto it = lru_map.find(key);
-		if (it != lru_map.end()) {
-			lru_list.erase(it->second);
-			lru_map.erase(it);
+		if (policy == EvictionPolicyType::LRU) {
+			const std::string victim = lru_list.back();
+			lru_list.pop_back();
+			lru_map.erase(victim);
+			store.erase(victim);
+			return;
 		}
+
+		// LFU eviction (simple)
+		std::string victim;
+		std::size_t min_freq = SIZE_MAX;
+
+		for (const auto& [key, f] : freq) {
+			if (f < min_freq) {
+				min_freq = f;
+				victim = key;
+			}
+		}
+
+		removeKey(victim);
 	}
 };
 
@@ -94,7 +118,13 @@ bool KVStore::set(const std::string& key,
 	bool exists = impl_->store.count(key);
 
 	impl_->store[key] = std::move(entry);
-	impl_->touchLRU(key);
+
+	if (impl_->policy == EvictionPolicyType::LRU) {
+		impl_->touchLRU(key);
+	}
+	else {
+		impl_->freq[key]++;   // LFU increment
+	}
 
 	if (!exists) {
 		impl_->evictIfNeeded();
@@ -116,7 +146,13 @@ bool KVStore::get(const std::string& key, std::string& out_value) {
 		return false;
 	}
 
-	impl_->touchLRU(key);
+	if (impl_->policy == EvictionPolicyType::LRU) {
+		impl_->touchLRU(key);
+	}
+	else {
+		impl_->freq[key]++;   // LFU increment
+	}
+
 	out_value = it->second.value;
 	return true;
 }

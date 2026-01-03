@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Build Redis-Lite as a static library
 add_library(redis_lite
     src/kv_store.cpp
-    src/lru_policy.cpp
-    src/lfu_policy.cpp
+    
+    
 )
 
 target_include_directories(redis_lite PUBLIC include)

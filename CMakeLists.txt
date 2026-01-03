@@ -15,11 +15,13 @@ add_library(redis_lite
 target_include_directories(redis_lite PUBLIC include)
 
 # Example executable
-# add_executable(example
-#    examples/example_usage.cpp
-#)
+add_executable(redis_lite_example
+    examples/example_usage.cpp
+)
 
-#target_link_libraries(example redis_lite)
+target_link_libraries(redis_lite_example
+    redis_lite
+)
 
 add_executable(redis_lite_tests
     tests/basic_tests.cpp

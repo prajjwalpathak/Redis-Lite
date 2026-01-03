@@ -49,7 +49,8 @@ Basic unit tests validate:
 - LFU eviction
 - Thread safety under concurrent access
 - Verified memory safety with Valgrind, ensuring zero memory leaks and no use-after-free errors
-
+- **Stress Testing**: Validated Redis-Lite using 150k+ randomized SET/GET/DEL operations with mixed TTLs under LRU and LFU eviction, asserting invariants and confirming zero memory leaks via Valgrind.
+ 
 ## Future Improvements
 
 - Background eviction thread
@@ -63,6 +64,7 @@ Basic unit tests validate:
 ```bash
 cd build
 ./redis_lite_tests
+./redis_lite_stress_tests
 ```
 
 - To execute example code:

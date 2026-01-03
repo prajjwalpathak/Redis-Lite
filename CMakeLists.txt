@@ -23,11 +23,21 @@ target_link_libraries(redis_lite_example
     redis_lite
 )
 
+# Test Executable
+
 add_executable(redis_lite_tests
     tests/basic_tests.cpp
 )
 
 target_link_libraries(redis_lite_tests
+    redis_lite
+)
+
+add_executable(redis_lite_stress_tests
+    tests/stress_tests.cpp
+)
+
+target_link_libraries(redis_lite_stress_tests
     redis_lite
 )
 

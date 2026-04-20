@@ -37,6 +37,9 @@ void stress_test(EvictionPolicyType policy) {
 	std::vector<std::string> keys;
 	keys.reserve(5000);
 
+	// Start Timer
+	auto start = std::chrono::high_resolution_clock::now();
+
 	for (int i = 0; i < OPERATIONS; ++i) {
 		int op = op_dist(rng);
 
@@ -62,8 +65,16 @@ void stress_test(EvictionPolicyType policy) {
 		assert(store.size() <= CAPACITY);
 	}
 
+	// End Timer
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = end - start;
+
+	double ops_per_sec = OPERATIONS / duration.count();
+
 	std::cout << "[STRESS TEST PASSED] "
 		<< (policy == EvictionPolicyType::LRU ? "LRU" : "LFU")
+		<< "\nTime: " << duration.count() << " seconds"
+		<< "\nThroughput: " << ops_per_sec << " ops/sec\n"
 		<< std::endl;
 }
 
